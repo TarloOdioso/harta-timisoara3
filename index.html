@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Harta sinagogilor din Timișoara</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <style>
+    body, html { height: 100%; margin: 0; font-family: Arial, Helvetica, sans-serif; }
+    #map { position: absolute; top: 0; right: 0; bottom: 0; left: 450px; }
+    #sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 430px; overflow:auto; padding: 16px; box-shadow: 2px 0 6px rgba(0,0,0,0.1); background: #fff; }
+    .place { padding: 10px; border-bottom: 1px solid #111ed0; cursor: pointer; }
+    .place h3 { margin: 0 0 6px 0; font-size: 16px; }
+    .place p { margin: 0; font-size: 13px; color: #444; }
+    .controls { margin-bottom: 12px; }
+    .credits { font-size: 12px; color: #666; margin-top: 10px; }
+    img.thumb { max-width: 100%; height: auto; border-radius: 4px; margin-top:8px }
+    .logo {display: block; width: 170px; margin: 0 auto 10px auto; border-radius: 8px;}
+    .emoji-marker {text-align: center; line-height: 30px;}
+    .leaflet-control.legend {background: white; padding: 10px 14px; border-radius: 8px; font-size: 14px; line-height: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);}
+    .legend-item {display: flex; align-items: center; margin-bottom: 5px;}
+    .legend-item span {font-size: 20px; margin-right: 6px;}
+    #gallery{margin-top:20px;}
+   .gallery{width:100%; margin-top:10px; border-radius:6px;}
+
+
+  </style>
+</head>
+<body>
+<div id="sidebar">
+  <h2>Patrimoniul Cultural Evreiesc din Timisoara</h2>
+<div class="controls">
+  <small>Click on a place or pin on the map for details.</small>
+</div>
+
+    <div id="list"></div>
+    <div id="gallery">
+  <h3>Bibliografie</h3>
+  <h4>Interviu Prof. Dr. Luciana Friedmann , Presedinte a Comunitatii Evreiesti din Timisoara in cadrul unei activitati organizate la biblioteca judeteana Timis.</h4>
+  <p style="text-align:center;">
+<a href="https://muzee.ubbcluj.ro/muzeeubb/muzeul-holocaustului/" target="_blank"
+style="background:#111ed0;color:white;padding:8px 14px;border-radius:6px;text-decoration:none;">
+Muzeul Holocaustului
+</a>
+</p>
+
+  <img class="gallery" src="images/document1.jpg.png" onclick="openImage(this.src)">
+  <img class="gallery" src="images/document2.jpg.png" onclick="openImage(this.src)">
+  <img class="gallery" src="images/document3.jpg.png" onclick="openImage(this.src)">
+  <img class="gallery" src="images/document4.jpg.png" onclick="openImage(this.src)">
+  <img class="gallery" src="images/ziar1.jpg.jpeg" onclick="openImage(this.src)">
+  <img class="gallery" src="images/ziar2.jpg.jpeg" onclick="openImage(this.src)">
+  <img class="gallery" src="images/ziar3.jpg.jpeg" onclick="openImage(this.src)">
+  <img class="gallery" src="images/ziar4.jpg.jpeg" onclick="openImage(this.src)">
+
+</div>
+
+    <div class="credits">
+
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+  
+      if (typeof L === 'undefined') {
+        alert('Eroare: Leaflet nu s-a încărcat corect. Verifică conexiunea la internet.');
+        return;
+      }
+
+      const synagogues = [
+        {
+          id: 'cetate',
+          title: 'Cetate Synagogue (Sinagoga din Cetate)',
+          coords: [45.756496, 21.226028],
+          description: '<p>Sinagoga din cartierul Cetate este un lăcaş de cult evreiesc construit între anii 1863-1865, în stil eclectic cu elemente maure, după planurile arhitectului Karl Schumann din Viena.Sinagoga a fost inaugurată în data de 19 septembrie 1865, fiind reinaugurată în anul 1872.</p> <p>După emigrarea masivă a evreilor, sinagoga a fost închisă. A fost redeschisă în septembrie 2005, cu ocazia unui concert organizat de Societatea Filarmonică din Timişoara. </p><p>În prezent, Federația Comunităților Evreiești din România administrează din nou sinagoga, în luna mai 2022 fiind redeschisă publicului în urma unor ample lucrări de restaurare.</p>',
+          img: 'https://spotlight-timisoara.eu/wp-content/uploads/2022/06/sinagogaCetatenew2.jpg'
+        },
+        {
+          id: 'fabric',
+          title: 'Fabric Synagugue (Sinagoga din Fabric)',
+          coords: [45.756348, 21.245321],
+          description: '<p>Sinagoga nouă din Fabric a fost construită de puternica comunitate mozaică Status quo ante, în anul 1899.</p><p>Această clădire cu o cupolă înaltă și două turnuri, a fost construită în stil maur si se afla intr-un context urbanistic strain noua astazi, pe malul unui brat al canalului Bega care ulterior a fost acoperit devenind stradă.</p><p>Sinagoga a fost proiectată de arhitectul Leopold Baumhorn.În data de 3 septembrie 1899, în ajunul Anului nou evreiesc, au avut loc festivitățile de inaugurare, in prezenta primarului Timisoarei, dr. Karl Telbisz si a rabinului Jakab Singer.</p>',
+
+          img: 'https://timisoara2023.eu/images/4lomNNZOvaB6tmF9is20rNKJjfw=/5079/width-1600%7Cformat-webp/1d1a9c91-0e8f-472b-8d9c-38a6f211e90a'
+        },
+        {
+          id: 'iosefin',
+          title: 'Iosefin Synagogue (Sinagoga din Iosefin)',
+          coords: [45.744, 21.212],
+          description: '<p>Aflată pe actuala stradă luliu Maniu, sinagoga din losefin, construită tot într-un stil cu influențe maure, a fost inaugurată în anul 1910 și are dimensiuni mult mai modeste decât cele din Cetate si Fabric, fiind de o inaltime mult mai mica.</p><p>In curtea sinagogii a functionat, in primii ani de existență a acesteia, o grădiniță și o școală primară evreiască.În prezent, este singura sinagogă din Timişoara în care se mai țin slujbe și tot aici are loc ceremonialul Bar Mitzvah, prin care băieții care au împlinit 13 ani devin adulți.</p>',
+          img: 'https://spotlight-timisoara.eu/wp-content/uploads/2019/10/sinagoga_001.jpg'
+        },
+        {id:'cvartal',
+          title:'The Jewish Quarter (Cvartalul Evreiesc)',
+          coords:[45.756974, 21.225936],
+          description:'<p>Cvartalul evreiesc este legat de începuturile comunitatii evreiesti in Timișoara. În perioada ocupației otomane (1552-1716), evrei sefarzi (spanioli) se stabilesc la Timișoara.</p><p>Sunt urmaşii evreilor expulzați de Inchiziția din Spania şi Portugalia, care se stabiliseră în Constantinopol sau Salonic.</p><p>Administrația turcească ia sfârşit în 1716, când Eugeniu de Savoya, comandantul trupelor habsburgice, cucereşte oraşul.Rascienii, grecii, evreii, armenii şi țiganii au dreptul să rămână în oraşul care trece sub administrația austriacă.Micii comunități de evrei cu statutul de tolerați i se atribuie o suprafață delimitată în oraş, unde se constituie Judencarré (cvartalul evreilor).</p>',
+          img:'https://merg.in/thumbs/facebook/2015/05/15/casa-printul-eugen-1339.jpgs'
+        },
+
+        {
+          id:'legi',
+          title:'Legile Antisemite',
+          coords:[45.753943, 21.225828],
+          description:'<p>În ce priveşte deportarea şi exterminarea, soarta evreilor din Timişoara a fost una specială. În 30 august 1940, supunându-se Dictatului de la Viena, România cedează aproape jumătate din teritoriul Transilvaniei în favoarea Ungariei, act impus de Germania nazistă și de Italia fascistă. </p><p>Partea de sud a Banatului rămâne în România, fapt care a salvat evreii din Timişoara de la deportarea în lagăre de exterminare.</p><p>În toamna anului 1942, în Timișoara au fost arestați zeci de evrei. Toți au fost îmbarcați în vagoane de marfă cu destinația Transnistria.</p><p> Primii au fost masacrați de îndată ce au ajuns în Transnistria, ceilalți au fost deportați în lagărul de la Vapnyarka, apoi la Olgopol, şi au supraviețuit aproape toți. </p><p>Numele celor 28 de victime timișorene ale regimului fascist sunt înscrise pe o placă comemorativă în cimitirul evreilor.În septembrie 1942 deportarea evreilor timişoreni la Auschwitz a fost anulată în ultima clipă. Ion Antonescu a anulat ordinul de deportare.</p><p> Intervențiile întreprinse de Regina-Mamă Elena, rabinul-şef Alexandru Safran, preşedintele comunităților evreieşti Wilhelm Fildermann, Mitropolitul Bălan, Baronul Ferdinand von Neumann din Arad, politicianul Iuliu Maniu şi alte personalități au fost factori importanți care au influențat decizia, pe fondul nemulțumirilor guvernului Antonescu legate de Dictatul de la Viena şi de situația de pe front.</p><p>În 1944, datorită faptului că au rămas în România, evreii timişoreni au fost cruțați de soarta evreilor din nordul Transilvaniei care a fost alipit Ungariei. În vara anului 1944, evreimea din Transilvania de Nord a fost deportată la Auschwitz, unde marea majoritate a pierit în camerele de gazare.</p><p>În comparație cu evreii din restul României şi chiar din Europa, cei din Timişoara au avut un destin special datorită concurs prielnic de împrejurări sus-amintite, dar şi datorită spiritului de toleranță şi de deschidere al locuitorilor oraşului. Mărturiile evreilor despre aceasta perioadă amintesc mereu „oameni de treabă” care le-au fost de ajutor în diferite situații.</p>',
+        },
+        {
+          id:'bancascont',
+          title:'Banca De Scont',
+          coords:[45.757538, 21.228017],
+          description:'<p>În Palatul Miksa Steiner a funcționat în perioada antebelică Banca de Scont a Ungariei de Sud, instituție bancară înființată în anul 1906.</p>',
+          img:'https://spotlight-timisoara.eu/wp-content/uploads/2022/06/bancaScontnew3.jpg'
+        },
+        {
+          id:'palatcomunitate',
+          title:'The Jewish Community Timisoara',
+          coords:[45.757676, 21.226224],
+          description:'<p>Palatul Comunitatii Evreiesti a fost proiectat de arhitectul maghiar Lipot Baumhorn, la inceputul anilor 1900, in stilul Art Nouveau – Secession</p>',
+          img:'https://ghidulbanatului.ro/wp-content/uploads/2024/10/462075880_10161458431537324_8679591697826778021_n-1536x1152.jpg'
+        },
+        {
+          id:'weiss',
+          title:'Weiss Palace',
+          coords:[45.754112, 21.225158],
+          description:'<p>Palatul Weiss este o clădire istorică din centrul Timișoarei, în Piața Victoriei, construită în 1921 de firma Arnold Merbl în stil eclectic pentru familia Weiss, după planurile lui Adalbert Szladek.</p>',
+          img:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Palatul_Weiss.jpg/1280px-Palatul_Weiss.jpg'
+        },
+        {
+          id:'Bruck',
+          title:'House of Brück',
+          coords:[45.757568, 21.228869],
+          description:'<p>Casa Brück este o clădire din Piața Unirii din Timișoara, edificiu construit în 1910 după planurile arhitectului László Székely în stilurile Art Nouveau și Secession, cu un caracter ușor eclectic.</p>',
+          img:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Casa_Br%C3%BCck%2C_Pia%C8%9Ba_Unirii%2C_Timi%C8%99oara_%282023%29_-_IMG_01.jpg/800px-Casa_Br%C3%BCck%2C_Pia%C8%9Ba_Unirii%2C_Timi%C8%99oara_%282023%29_-_IMG_01.jpg'
+        },
+        {
+          id:'Loeffler',
+          title:'Loeffler Palace',
+          coords:[45.753232, 21.225787],
+          description:'<p>Palatul Löffler este o clădire istorică din centrul Timișoarei, în Piața Victoriei, construită între 1912 - 1913 de familia și firma Löffler, după planurile lui Henrik Telkes.</p>',
+          img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Timi%C8%99oara_-_Palatul_L%C3%B6ffler_%2843096206240%29.jpg/1280px-Timi%C8%99oara_-_Palatul_L%C3%B6ffler_%2843096206240%29.jpg',
+        },
+        {
+          id:'Marschall',
+          title:'Marschall Palace',
+          coords:[45.749201, 21.220182],
+          description:'<p>Palatul Franz (Ferencz) Marschall este o clădire monumentală, construită în 1904, situată pe Splaiul Tudor Vladimirescu, la intrarea dinspre centrul orașului spre cartierul Elisabetin din Timișoara. Face parte din Situl urban „Vechiul Cartier Iosefin”.</p>',
+          img:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Marschall_Palace_2024_%281%29.jpg/1280px-Marschall_Palace_2024_%281%29.jpg'
+        },
+        {
+          id:'Hilt',
+          title:'Vogel Hilt',
+          coords:[45.751946, 21.224498],
+          description:'<p>László Székely este arhitectul care a proiectat si palatul Hilt-Vogel din Piata Victoriei. Cladirea a fost ridicata intre anii 1912-1913. Imobilul a fost proiectat lipit de o alta cladire-monument: Palatul Széchenyi, planuita si realizata de acelasi arhitect.</p>',
+          img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Palatul_Hilt-Vogel.jpg/1280px-Palatul_Hilt-Vogel.jpg'
+        },
+
+        {
+          id: 'neuhausz',
+          title:'Neuhausz Palace (Palatul Neuhausz)',
+          coords: [45.753187, 21.225232],
+          description:'<p>Palatul Neuhausz se afla în proprietatea lui Bernat Farber, proprietarul unui magazin de textile în cartierul Fabric şi membru în conducerea comunității evreieşti din Cetate şi Fabric după unirea lor în 1935. </p><p>Eugen Farber, fiul lui Bernat, a fost proprietarul unei fabrici de lacuri si vopsele din Timisoara, Fabrica Azur. Odată cu instaurarea regimului comunist, a fost expropriat.</p><p>A reuşit să fugă din România în Ungaria într-un car cu fân. După 1989, John J. Farber a revendicat dreptul asupra proprietăţii şi a negociat cu statul român achiziţionarea pachetului majoritar de acţiuni al Azur SA.</p><p>În 2013, John J. Farber a fost inclus în Forbes 400, adică printre primii 400 cei mai bogați americani, unul dintre cei 39 de americani născuți în afara Statelor Unite ale Americii de pe această listă.</p> ',
+          img:'https://upload.wikimedia.org/wikipedia/commons/3/3a/Timisoara%2C_Palatul_Neuhausz_2022_%281%29.jpg'
+        },
+        
+      {
+        id:'dauerbach',
+        title:'Dauerbach Palace (Palatul Dauerbach)',
+        coords:[45.752555, 21.224892],
+        description:'<p>Palatul Dauerbach cunoscut și sub numele de Palace, este o clădire istorică din centrul Timișoarei, în Piața Victoriei, construită în 1913 în stil Art Nouveau pentru Georg Dauerbach, după planurile arhitectului László Székely.</p>',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Dauerbach-Palais.JPG/1280px-Dauerbach-Palais.JPG'
+      },
+      
+      {
+        id:'neumann',
+        title:'Neumann Palace from Arad (Palatul Neumann din Arad)',
+        coords:[46.175444, 21.317753],
+        description:'<p>Palatul Neuman este un edificiu situat pe bulevardul Revoluției, în municipiul Arad. A fost construit între anii 1891-1892 la comanda familiei de industriași Neuman.</p>',
+        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Arad_-_Palatul_Neumann_%282023%29_-_img_05.jpg/1280px-Arad_-_Palatul_Neumann_%282023%29_-_img_05.jpg'
+      },
+      {
+        id:'spirt&drojdie',
+        title:'Arad Rubbing Alcohol and Yeast Factory',
+        coords:[46.201324, 21.285412],
+        description:'<p>Fabrica de Spirt și Drojdie din Arad a fost fondată în anul 1851 de către Adolf Neuman, venit din Boemia. După două incendii de proporții, în 1884 a fost terminată actuala clădire, cea mai modernă fabrică a vremii din sud-estul Europei. Alături a funcționat și o moară, precum și o fermă de porci. Instalațiile au rămas funcționale timp de peste o sută de ani, fiind demontate abia după 1990. Fabrica și moara au fost transformate în societate anonimă în 1922, ramânând în proprietatea familiei Neuman pâna la naționalizarea din 1948.</p>',
+        img:'https://provinciacrisana.wordpress.com/wp-content/uploads/2017/09/43_big.jpg?w=474'
+      },
+      {
+        id:'stadion',
+        title:'Francis Neuman Stadium ',
+        coords:[46.192044, 21.310790],
+        description:'<p>Stadionul Francisc Neuman, cunoscut și ca Stadionul UTA, este un stadion de fotbal din Arad, România. Este construit pe locul fostului stadion Francisc von Neuman.</p>',
+        img:'https://wesports-post.fra1.cdn.digitaloceanspaces.com/1597671574742'
+      },
+
+    ];
+  
+
+      const map = L.map('map').setView([45.75, 21.23], 13);
+const legend = L.control({ position: "bottomright" });
+
+legend.onAdd = function () {
+  const div = L.DomUtil.create("div", "legend leaflet-control");
+  div.innerHTML = `
+    <div class="legend-item"><span>🕍</span> Synagogue</div>
+    <div class="legend-item"><span>🏛️</span> Palace</div>
+    <div class="legend-item"><span>💰</span> Bank</div>
+    <div class="legend-item"><span>🏭</span> Factory</div>
+    <div class="legend-item"><span>🏠</span> Community Building</div>
+    <div class="legend-item"><span>🏟️</span> Stadium</div>
+    <div class="legend-item"><span>🕎</span> Jew Quarter</div>
+  `;
+  return div;
+};
+legend.addTo(map);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      const markers = {};
+      const listEl = document.getElementById('list');
+
+
+function getEmojiIcon(emoji) {
+  return L.divIcon({
+    html: `<div style="font-size:26px;">${emoji}</div>`,
+    className: "emoji-marker",
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
+}
+
+      synagogues.forEach(s => {
+
+
+if (s.title.includes("Sinagoga")) emoji = "🕍";
+else if (s.title.includes("Palace") || s.title.includes("Palatul")) emoji = "🏛️";
+else if (s.title.includes("Vogel") || s.title.includes("Vogel Hilt")) emoji = "🏛️";
+else if (s.title.includes("House") || s.title.includes("House of Brück")) emoji = "🏛️";
+else if (s.title.includes("Banca")) emoji = "💰";
+else if (s.title.includes("Jewish Community")) emoji = "🏠";
+else if (s.title.includes("Factory") || s.title.includes("Fabr")) emoji = "🏭";
+else if (s.title.includes("Stadium")) emoji = "🏟️";
+else if (s.title.includes("Quarter")) emoji = "🕎";
+
+const marker = L.marker(s.coords, { icon: getEmojiIcon(emoji) }).addTo(map);
+
+        const popupHtml = `
+          <div style="min-width:200px">
+            <strong>${s.title}</strong>
+            <p>${s.description}</p>
+            ${s.img ? `<img class='thumb' src='${s.img}' alt='${s.title}'>` : ''}
+          </div>`;
+        marker.bindPopup(popupHtml);
+        markers[s.id] = marker;
+
+        const item = document.createElement('div');
+        item.className = 'place';
+        item.innerHTML = `<h3>${s.title}</h3><p>${s.description}</p>`;
+        item.addEventListener('click', () => {
+          map.setView(s.coords, 16);
+          marker.openPopup();
+        });
+        listEl.appendChild(item);
+      });
+    });
+
+    function openImage(src){
+
+const overlay = document.createElement("div");
+overlay.style.position = "fixed";
+overlay.style.top = "0";
+overlay.style.left = "0";
+overlay.style.width = "100%";
+overlay.style.height = "100%";
+overlay.style.background = "rgba(0,0,0,0.9)";
+overlay.style.display = "flex";
+overlay.style.alignItems = "center";
+overlay.style.justifyContent = "center";
+overlay.style.zIndex = "9999";
+
+const img = document.createElement("img");
+img.src = src;
+img.style.maxWidth = "90%";
+img.style.maxHeight = "90%";
+img.style.borderRadius = "10px";
+
+overlay.appendChild(img);
+
+overlay.onclick = function(){
+document.body.removeChild(overlay);
+}
+
+document.body.appendChild(overlay);
+
+}
+  </script>
+</body>
+</html>
